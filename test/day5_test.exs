@@ -1,6 +1,7 @@
 defmodule Aoc2021Test.D5 do
   use ExUnit.Case
   doctest Aoc2021
+  @moduletag :day5
   
   setup do
     {:ok, demo_input1: 
@@ -75,9 +76,9 @@ defmodule Aoc2021Test.D5 do
   test "populate grid", context do
     max = Aoc2021.Day5.get_grid_max(context[:demo_input1])
     danger_grid = Aoc2021.Day5.make_grid(max)
-    |> IO.inspect(label: "test grid")
+    #|> IO.inspect(label: "test grid")
     |> Aoc2021.Day5.populate_danger(context[:demo_input1])
-    |> IO.inspect(label: "test danger grid")
+    #|> IO.inspect(label: "test danger grid")
     
     assert Aoc2021.Day5.get_c(danger_grid, {0,0}) == 1
     assert Aoc2021.Day5.get_c(danger_grid, {1,1}) == 1
