@@ -61,5 +61,49 @@ defmodule Aoc2021 do
                                 
   end
   
+  def make_hash(input) do
+    hash = %{"0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "7": 0, "8": 0}
+    
+    Enum.reduce(input, hash, fn fish, hash -> key = String.to_atom(Integer.to_string(fish))
+                                              {_, result} = Map.get_and_update(hash, key, fn current -> {current, current + 1} end)
+                                              result
+                                              end)
+  end
+  
+  def next_gen(hash) do 
+    
+    nextgen = hash
+    |> Enum.reduce(%{}, fn fish_group, new_hash -> 
+                            case fish_group do
+                                    {:"8", count} -> Map.update(new_hash, :"7", count, fn count -> count end)
+                                    {:"7", count} -> Map.update(new_hash, :"6", count, fn count -> count end)
+                                    {:"6", count} -> Map.update(new_hash, :"5", count, fn count -> count end)
+                                    {:"5", count} -> Map.update(new_hash, :"4", count, fn count -> count end)
+                                    {:"4", count} -> Map.update(new_hash, :"3", count, fn count -> count end)
+                                    {:"3", count} -> Map.update(new_hash, :"2", count, fn count -> count end)
+                                    {:"2", count} -> Map.update(new_hash, :"1", count, fn count -> count end)
+                                    {:"1", count} -> Map.update(new_hash, :"0", count, fn count -> count end)
+                                    {:"0", count} -> new_hash = Map.update(new_hash, :"8", count, fn count -> count end)
+                                                     current_plus_count = Map.fetch!(hash, :"7") + count
+                                                     Map.update(new_hash, :"6", current_plus_count, fn current_plus_count -> current_plus_count end)
+                                                          
+                                                     
+                                    
+                            end
+                        end)
+    |> IO.inspect()
+    
+    
+    
+  end
 
+  def run_gen_hash(hash, 0), do: hash
+  def run_gen_hash(hash, count) do
+      run_gen_hash(next_gen(hash), count-1)
+  end
+  
+  def get_sum(hash) do
+    Enum.reduce(hash, 0, fn fish_group = {_, count}, sum -> sum + count end)
+  end
+  
 end
