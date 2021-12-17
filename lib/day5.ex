@@ -69,83 +69,106 @@ defmodule Aoc2021.Day5 do
     Both parts of this puzzle are complete! They provide two gold stars: **
   """
 
-      def day5() do
+  def day5() do
+    g_max = get_grid_max(Aoc2021.input("day5"))
 
-      g_max = get_grid_max(Aoc2021.input("day5"))
-      
-      grid = make_grid(g_max)
+    grid = make_grid(g_max)
 
-      danger_count = populate_danger(grid, Aoc2021.input("day5"))
-        |> Map.to_list()
-        |> Enum.reduce(0, fn {{_x, _y}, danger}, count -> if danger >= 2 do
-                                                            count + 1 
-                                                          else
-                                                            count
-                                                          end 
-                                                        end )
-        |> IO.inspect(label: "danger_count")
+    danger_count =
+      populate_danger(grid, Aoc2021.input("day5"))
+      |> Map.to_list()
+      |> Enum.reduce(0, fn {{_x, _y}, danger}, count ->
+        if danger >= 2 do
+          count + 1
+        else
+          count
+        end
+      end)
+      |> IO.inspect(label: "danger_count")
   end
-  
+
   def get_grid_max(input) do
-     max = input
+    max =
+      input
       |> String.split(~r/\n/, trim: true)
       |> Enum.map(fn line ->
-            [a, b, c, d] = line |> String.split(~r/\,| -> /, trim: true) 
-            end )
-      |> List.flatten
+        [a, b, c, d] = line |> String.split(~r/\,| -> /, trim: true)
+      end)
+      |> List.flatten()
       |> Enum.map(&String.to_integer/1)
-      |> Enum.reduce(0, fn cur, acc -> max(cur, acc) end )
+      |> Enum.reduce(0, fn cur, acc -> max(cur, acc) end)
+  end
 
-  end
-  
   def make_grid(size) do
-    grid = for x <- 0..size, y <- 0..size, into: %{}, do: {{x,y}, 0}
+    grid = for x <- 0..size, y <- 0..size, into: %{}, do: {{x, y}, 0}
   end
-  
-  def inc_coord(grid, {_x, _y}=coord) do
+
+  def inc_coord(grid, {_x, _y} = coord) do
     {_, new_grid} = Map.get_and_update(grid, coord, fn count -> {count, count + 1} end)
     new_grid
   end
-  
+
   def inc_line(grid, [{x1, y1}, {x2, y2}]) do
-    cond do 
-      x1 == x2 -> Enum.reduce(y1..y2, grid, fn y, grid -> inc_coord(grid, {x1, y})  end )
-      y1 == y2 -> Enum.reduce(x1..x2, grid, fn x, grid -> inc_coord(grid, {x, y1})  end )
-      x1 < x2 || y1 > y2 || x1 > x2 || y1 < y2 -> inc_diag_line(grid, [{x1, y1}, {x2, y2}])
-      true -> IO.inspect([{x1, y1}, {x2, y2}], label: "not found")
-              grid
+    cond do
+      x1 == x2 ->
+        Enum.reduce(y1..y2, grid, fn y, grid -> inc_coord(grid, {x1, y}) end)
+
+      y1 == y2 ->
+        Enum.reduce(x1..x2, grid, fn x, grid -> inc_coord(grid, {x, y1}) end)
+
+      x1 < x2 || y1 > y2 || x1 > x2 || y1 < y2 ->
+        inc_diag_line(grid, [{x1, y1}, {x2, y2}])
+
+      true ->
+        IO.inspect([{x1, y1}, {x2, y2}], label: "not found")
+        grid
     end
   end
-  
+
   def inc_diag_line(grid, [{x1, y1}, {x2, y2}]) do
     steps = Enum.count(x1..x2)
-    
-    cond do 
-          x1 < x2 && y1 < y2 -> Enum.reduce(0..steps-1, grid, fn step, grid -> inc_coord(grid, {x1+step, y1+step}) end ) 
-          x1 < x2 && y1 > y2 -> Enum.reduce(0..steps-1, grid, fn step, grid -> inc_coord(grid, {x1+step, y1-step}) end )
-          x1 > x2 && y1 < y2 -> Enum.reduce(0..steps-1, grid, fn step, grid -> inc_coord(grid, {x1-step, y1+step}) end ) 
-          x1 > x2 && y1 > y2 -> Enum.reduce(0..steps-1, grid, fn step, grid -> inc_coord(grid, {x1-step, y1-step}) end )
-        end
+
+    cond do
+      x1 < x2 && y1 < y2 ->
+        Enum.reduce(0..(steps - 1), grid, fn step, grid ->
+          inc_coord(grid, {x1 + step, y1 + step})
+        end)
+
+      x1 < x2 && y1 > y2 ->
+        Enum.reduce(0..(steps - 1), grid, fn step, grid ->
+          inc_coord(grid, {x1 + step, y1 - step})
+        end)
+
+      x1 > x2 && y1 < y2 ->
+        Enum.reduce(0..(steps - 1), grid, fn step, grid ->
+          inc_coord(grid, {x1 - step, y1 + step})
+        end)
+
+      x1 > x2 && y1 > y2 ->
+        Enum.reduce(0..(steps - 1), grid, fn step, grid ->
+          inc_coord(grid, {x1 - step, y1 - step})
+        end)
+    end
   end
-  
+
   def populate_danger(grid, input) do
     input
-        |> String.split(~r/\n/, trim: true)
-        |> Enum.map(fn line -> [x1, y1, x2, y2] = line |> String.split(~r/\,| -> /, trim: true) 
-                        [{to_int(x1), to_int(y1)}, {to_int(x2), to_int(y2)}] 
-                        end)
-        |> Enum.reduce(grid, fn coords, grid -> inc_line(grid, coords) end )
+    |> String.split(~r/\n/, trim: true)
+    |> Enum.map(fn line ->
+      [x1, y1, x2, y2] = line |> String.split(~r/\,| -> /, trim: true)
+      [{to_int(x1), to_int(y1)}, {to_int(x2), to_int(y2)}]
+    end)
+    |> Enum.reduce(grid, fn coords, grid -> inc_line(grid, coords) end)
   end
-  
+
   def to_int(str) do
     String.to_integer(str)
   end
-  
-  def get_c(grid, {x,y}=_coord) do
+
+  def get_c(grid, {x, y} = _coord) do
     case Map.fetch(grid, {x, y}) do
       {:ok, val} -> val
       {:error, _} -> :error
     end
   end
-
 end

@@ -7,5 +7,14 @@ defmodule Aoc2021 do
       file
   end
   
+    
+  def input_to_list(input) do
+    input
+    |> String.split(",")
+    |> Stream.map(&String.to_integer(&1))
+    |> Enum.to_list()
+    #|> IO.inspect(label: "input list")
+  end
   
+    
 end

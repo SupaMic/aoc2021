@@ -85,47 +85,48 @@ defmodule Aoc2021.Day1 do
   """
 
   def day1() do
-      data = Aoc2021.input("day1")
+    data =
+      Aoc2021.input("day1")
       |> String.split("\n")
       |> Enum.map(&String.to_integer/1)
-      
-      day1part1(data, 0)
-      day1part2(data, 0)
+
+    day1part1(data, 0)
+    day1part2(data, 0)
   end
-  
+
   def day1part1([], count), do: IO.puts(count)
-  
+
   def day1part1([_only_a_head], count), do: day1part1([], count)
-  
-  def day1part1(_list=[head|tail], count) do
-      if head < List.first(tail) do 
-        day1part1(tail, count + 1)
-      else
-        day1part1(tail, count)
-      end
+
+  def day1part1(_list = [head | tail], count) do
+    if head < List.first(tail) do
+      day1part1(tail, count + 1)
+    else
+      day1part1(tail, count)
+    end
   end
-  
+
   def day1part2([], count), do: IO.puts(count)
-  
+
   def day1part2([_only_a_head], count), do: day1part2([], count)
-  
+
   def day1part2(list, count) do
-      a_group_sum = list
-        |> Enum.take(3)
-        |> Enum.sum
-      
-      [_head | b_group] = list
-      
-      b_group_sum = b_group
-        |> Enum.take(3)
-        |> Enum.sum
-      
-      if a_group_sum < b_group_sum do
-        day1part2(b_group, count + 1)
-      else
-        day1part2(b_group, count)
-      end
+    a_group_sum =
+      list
+      |> Enum.take(3)
+      |> Enum.sum()
+
+    [_head | b_group] = list
+
+    b_group_sum =
+      b_group
+      |> Enum.take(3)
+      |> Enum.sum()
+
+    if a_group_sum < b_group_sum do
+      day1part2(b_group, count + 1)
+    else
+      day1part2(b_group, count)
+    end
   end
-  
- 
 end
